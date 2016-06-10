@@ -71,6 +71,8 @@ gulp.task('compile', () => {
         // compilation_level: 'ADVANCED_OPTIMIZATIONS',
         //
         language_in: 'ECMASCRIPT5',
+        //new_type_inf: true, -- Enforces goog.requires. Currently 245 warnings.
+
         // Note that warning_level=VERBOSE corresponds to:
         //
         // --jscomp_warning=checkTypes
@@ -153,7 +155,7 @@ gulp.task('update-html-compiled', ['compile'], () => {
     }))
 });
 
-gulp.task('test-compile', ['update-html-compiled'], () => {
+gulp.task('compile-test', ['update-html-compiled'], () => {
   return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
 });
 
