@@ -34,9 +34,9 @@ glift.enums.states = {
  * @enum{string}
  */
 glift.enums.boardAlignments = {
-  TOP: "TOP",
-  RIGHT: "RIGHT",
-  CENTER: "CENTER"
+  TOP: 'TOP',
+  RIGHT: 'RIGHT',
+  CENTER: 'CENTER'
 };
 
 
@@ -116,51 +116,6 @@ glift.enums.problemResults = {
 };
 
 /**
- * How data from glift.intersections should be displayed.
- * @enum {string}
- */
-// TODO(kashomon): Delete when we migrate to flattener.
-glift.enums.displayDataTypes = {
-  PARTIAL: 'PARTIAL',
-  FULL: 'FULL'
-};
-
-/**
- * Used to create svg element Ids.  The enum values are slightly modified to
- * be compatible with being class / id names.
- * @enum{string}
- */
-glift.enums.svgElements = {
-  SVG: 'svg',
-  BOARD: 'board',
-  BOARD_COORD_LABELS: 'board_coord_labels',
-  INTERSECTIONS_CONTAINER: 'intersections',
-  BOARD_LINE: 'board_line',
-  BOARD_LINE_CONTAINER: 'board_line_container',
-  BUTTON: 'button',
-  BUTTON_CONTAINER: 'button_container',
-  FULL_BOARD_BUTTON: 'full_board_button',
-  MARK: 'mark',
-  TEMP_MARK_GROUP: 'temp_mark_group',
-  MARK_CONTAINER: 'mark_container',
-  GLIFT_ELEMENT: 'glift_element',
-  STARPOINT: 'starpoint',
-  STARPOINT_CONTAINER: 'starpoint_container',
-  STONE: 'stone',
-  STONE_CONTAINER: 'stone_container',
-  STONE_SHADOW: 'stone_shadow',
-  STONE_SHADOW_CONTAINER: 'stone_shadow_container',
-  GUIDE_LINE: 'guide_line',
-
-  // Icon-bar specific glift.enums
-  ICON: 'icon',
-  ICON_CONTAINER: 'icon_container',
-  TEMP_ICON: 'temp_icon',
-  TEMP_TEXT: 'temp_text',
-  TEMP_ICON_CONTAINER: 'temp_icon_container'
-};
-
-/**
  * Whether or not to show variations in the UI.
  * @enum {string}
  */
@@ -168,39 +123,6 @@ glift.enums.showVariations = {
   ALWAYS: 'ALWAYS',
   NEVER: 'NEVER',
   MORE_THAN_ONE: 'MORE_THAN_ONE'
-};
-
-/**
- * The types of widgets users can create. Used to link Controllers and Options.
- * @enum {string}
- */
-glift.enums.widgetTypes = {
-  CORRECT_VARIATIONS_PROBLEM: 'CORRECT_VARIATIONS_PROBLEM',
-  EXAMPLE: 'EXAMPLE',
-  GAME_VIEWER: 'GAME_VIEWER',
-  REDUCED_GAME_VIEWER: 'REDUCED_GAME_VIEWER',
-  STANDARD_PROBLEM: 'STANDARD_PROBLEM',
-  BOARD_EDITOR: 'BOARD_EDITOR'
-};
-
-/**
- * The types of components that exist in the Glift UI.
- * @enum {string}
- */
-glift.enums.boardComponents = {
-  BOARD: 'BOARD',
-  COMMENT_BOX: 'COMMENT_BOX',
-  EXTRA_ICONBAR: 'EXTRA_ICONBAR',
-  ICONBAR: 'ICONBAR',
-  STATUS_BAR: 'STATUS_BAR'
-};
-
-/**
- * @enum {string}
- */
-glift.enums.dubug = {
-  NONE: 'NONE',
-  INFO: 'INFO'
 };
 
 /**
