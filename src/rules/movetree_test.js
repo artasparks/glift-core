@@ -16,7 +16,7 @@
     deepEqual(p.getOneValue('GM'), '1');
     deepEqual(p.getOneValue('FF'), '4');
     deepEqual(p.getOneValue('CA'), 'UTF-8');
-    deepEqual(p.getOneValue('AP'), 'Glift:' + glift.global.version);
+    deepEqual(p.getOneValue('AP'), 'Glift-core:' + glift.global['core-version']);
     deepEqual(p.getOneValue('KM'), '0.00');
     deepEqual(p.getOneValue('RU'), 'Japanese');
     deepEqual(p.getOneValue('SZ'), '19');
