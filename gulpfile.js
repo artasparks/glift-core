@@ -64,7 +64,7 @@ gulp.task('compile', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
     .pipe(closureCompiler({
       compilerPath: './compiler-latest/compiler.jar',
-      fileName: 'glift.js',
+      fileName: 'glift-core.js',
       compilerFlags: {
         // TODO(kashomon): Turn on ADVANCED_OPTIMIZATIONS when all the right
         // functions have been marked @export, where appropriate
@@ -112,7 +112,7 @@ gulp.task('compile', () => {
 
 gulp.task('concat', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
-    .pipe(concat('glift_combined.js'))
+    .pipe(concat('glift-core-concat.js'))
     .pipe(size())
     .pipe(gulp.dest('./compiled/'))
 })
@@ -143,7 +143,7 @@ gulp.task('update-html-tests', () => {
 
 // Update the HTML tests with the compiled glift.
 gulp.task('update-html-compiled', ['compile'], () => {
-  return gulp.src('./compiled/glift.js')
+  return gulp.src('./compiled/glift-core.js')
     .pipe(updateHtmlFiles({
       filesGlob: './test/htmltests/*.html',
       outDir: './test/htmltests_gen/',
@@ -151,6 +151,10 @@ gulp.task('update-html-compiled', ['compile'], () => {
       footer: '<!-- END-AUTO-GEN-DEPS -->',
       dirHeader: '<!-- %s sources -->',
     }))
+});
+
+gulp.task('test-compile', ['update-html-compiled'], () => {
+  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
 });
 
 gulp.task('compile-watch', () => {
