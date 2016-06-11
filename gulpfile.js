@@ -18,10 +18,10 @@ var srcPaths = [
   // Top level source package must go first since it defines the namespace
   'src/glift.js',
 
-  // Enums are depended on directly by lots of other packages.
+  // Point and enums from util are depended on by everything. Perhaps they
+  // should go at the top level?
   'src/util',
 
-  // The rest of glift-core
   'src']
 
 // Ignore the test files
