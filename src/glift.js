@@ -22,9 +22,9 @@ goog.provide('glift');
 
 (function(w) {
 
-var glift = w.glift || {};
+var g = glift || w.glift || {};
 if (w) {
   // expose Glift as a global.
-  w.glift = glift;
+  w.glift = g ;
 }
 })(window);
