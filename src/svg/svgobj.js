@@ -236,7 +236,7 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Get all the Children.
-   * @return {!Array<glift.svg.SvgObj>}
+   * @return {!Array<!glift.svg.SvgObj>}
    */
   children: function() {
     return this.children_;
