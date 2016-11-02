@@ -198,7 +198,7 @@ glift.svg.SvgObj.prototype = {
   },
 
   /** @return {string} The text on the node. */
-  text: function(text) {
+  text: function() {
     return this.text_;
   },
 
