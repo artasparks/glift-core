@@ -28,9 +28,12 @@ glift.flattener.BoardPt;
 glift.flattener.EdgeLabel;
 
 /**
- * BoardPoints maintains a mapping from an intersection on the board
- * to a coordinate in pixel-space. It also contains information about the
- * spcaing of the points and the radius (useful for drawing circles).
+ * BoardPoints is a helper for actually rendering the board when pixel
+ * representations are required.
+ *
+ * In more detail: board points maintains a mapping from an intersection on the
+ * board to a coordinate in pixel-space. It also contains information about the
+ * spacing of the points and the radius (useful for drawing circles).
  *
  * Later, this is directly to create everything that lives on an intersection.
  * In particular,
@@ -43,13 +46,14 @@ glift.flattener.EdgeLabel;
  *
  * @param {!Array<!glift.flattener.BoardPt>} points
  * @param {number} spacing
+ * @param {!glift.orientation.BoundingBox} intBbox
  * @param {number} numIntersections
  * @param {!Array<glift.flattener.EdgeLabel>=} opt_edgeLabels
  *
  * @constructor @final @struct
  */
 glift.flattener.BoardPoints = function(
-    points, spacing, numIntersections, opt_edgeLabels) {
+    points, spacing, intBbox, numIntersections, opt_edgeLabels) {
   /** @const {!Array<!glift.flattener.BoardPt>} */
   this.points = points;
 
@@ -64,13 +68,15 @@ glift.flattener.BoardPoints = function(
   this.spacing = spacing;
   /** @const {number} */
   this.radius = spacing / 2;
+
+  /** @const {!glift.orientation.BoundingBox} */
+  this.intBbox = intBbox;
+
   /** @const {number} */
   this.numIntersections = numIntersections;
+
   /** @const {!Array<!glift.flattener.EdgeLabel>} */
   this.edgeCoordLabels = opt_edgeLabels || [];
-
-  /** @private {!Array<glift.flattener.BoardPt>|undefined} */
-  this.dataCache_ = undefined;
 };
 
 glift.flattener.BoardPoints.prototype = {
@@ -142,4 +148,42 @@ glift.flattener.BoardPoints.prototype = {
     }
     return outStarPoints;
   }
+};
+
+/**
+ * Creates a beard points wrapper from a flattened object.
+ *
+ * @param {!glift.flattener.Flattened} flat
+ * @param {number} spacing In pt.
+ */
+glift.flattener.BoardPoints.fromFlattened = function(flat, spacing) {
+  return glift.flattener.BoardPoints.fromBbox(
+      flat.board().boundingBox(), spacing, flat.board().maxBoardSize());
+};
+
+/**
+ * Creates a board points wrapper.
+ *
+ * @param {glift.orientation.BoundingBox} bbox In intersections
+ * @param {number} spacing Of the intersections. In pt.
+ * @param {number} size
+ * @return {!glift.flattener.BoardPoints}
+ */
+glift.flattener.BoardPoints.fromBbox = function(bbox, spacing, size) {
+  var tl = bbox.topLeft();
+  var br = bbox.botRight();
+  var half = spacing / 2;
+  /** @type {!Array<!glift.flattener.BoardPt>} */
+  var bpts = [];
+  for (var x = tl.x(); x < bbox.width(); x++) {
+    for (var y = tl.y(); y < bbox.height(); y++) {
+      var i = x - tl.x();
+      var j = y - tl.y();
+      var b = {
+        intPt: new glift.Point(x, y),
+        coordPt: new glift.Point(x + half + i*spacing, y + half + j*spacing),
+      };
+    }
+  }
+  return new glift.flattener.BoardPoints(bpts, spacing, bbox, size);
 };
