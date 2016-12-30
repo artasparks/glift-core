@@ -15,4 +15,35 @@
     ok(bp.hasCoord(new glift.Point(18, 18)));
     ok(!bp.hasCoord(new glift.Point(19, 19)));
   });
+
+  test('BoardPoints: star points.', function() {
+    var bp = glift.flattener.BoardPoints.fromFlattened(flat, spacing);
+    bp.numIntersections = 19;
+    deepEqual(bp.starPoints(), [
+      new glift.Point(3,3),
+      new glift.Point(3,9),
+      new glift.Point(3,15),
+      new glift.Point(9,3),
+      new glift.Point(9,9),
+      new glift.Point(9,15),
+      new glift.Point(15,3),
+      new glift.Point(15,9),
+      new glift.Point(15,15)]);
+
+    bp.numIntersections = 13;
+    deepEqual(bp.starPoints(), [
+      new glift.Point(3,3),
+      new glift.Point(3,9),
+      new glift.Point(9,3),
+      new glift.Point(9,9),
+      new glift.Point(6,6)]);
+
+    bp.numIntersections = 9;
+    deepEqual(bp.starPoints(), [
+      new glift.Point(2,2),
+      new glift.Point(2,6),
+      new glift.Point(6,2),
+      new glift.Point(6,6),
+      new glift.Point(4,4)]);
+  });
 })();
