@@ -80,6 +80,11 @@ glift.flattener.BoardPoints = function(
 };
 
 glift.flattener.BoardPoints.prototype = {
+  /** @return {number} intersection-width */
+  intWidth: function() { return this.intBbox.width() + 1; },
+  /** @return {number} intersection-width */
+  intHeight: function() { return this.intBbox.height() + 1; },
+
   /**
    * Get the coordinate for a given integer point string.  Note: the integer
    * points are 0 indexed, i.e., 0->18 for a 19x19.  Recall that board points
@@ -175,14 +180,15 @@ glift.flattener.BoardPoints.fromBbox = function(bbox, spacing, size) {
   var half = spacing / 2;
   /** @type {!Array<!glift.flattener.BoardPt>} */
   var bpts = [];
-  for (var x = tl.x(); x < bbox.width(); x++) {
-    for (var y = tl.y(); y < bbox.height(); y++) {
+  for (var x = tl.x(); x <= bbox.width(); x++) {
+    for (var y = tl.y(); y <= bbox.height(); y++) {
       var i = x - tl.x();
       var j = y - tl.y();
       var b = {
         intPt: new glift.Point(x, y),
         coordPt: new glift.Point(x + half + i*spacing, y + half + j*spacing),
       };
+      bpts.push(b);
     }
   }
   return new glift.flattener.BoardPoints(bpts, spacing, bbox, size);
