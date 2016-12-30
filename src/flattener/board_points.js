@@ -11,7 +11,6 @@ goog.provide('glift.flattener.BoardPt');
  * @typedef {{
  *  intPt: !glift.Point,
  *  coordPt: !glift.Point,
- *  bbox: !glift.orientation.BoundingBox
  * }}
  */
 glift.flattener.BoardPt;
