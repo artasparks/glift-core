@@ -12,7 +12,32 @@
     deepEqual(bp.intWidth(), 19, 'width');
 
     ok(bp.hasCoord(new glift.Point(0, 0)));
+    deepEqual(bp.getCoord(new glift.Point(0, 0)).coordPt,
+        new glift.Point(spacing/2, spacing/2), 'Zero coordPt');
+
     ok(bp.hasCoord(new glift.Point(18, 18)));
+    deepEqual(bp.getCoord(new glift.Point(18, 18)).coordPt,
+        new glift.Point(18*spacing + spacing/2, 18*spacing + spacing/2),
+        '18,18 coordPt');
+
+    ok(bp.hasCoord(new glift.Point(13, 15)));
+    deepEqual(bp.getCoord(new glift.Point(13, 15)).intPt,
+        new glift.Point(13,15));
+    deepEqual(bp.getCoord(new glift.Point(13, 15)).coordPt,
+        new glift.Point(13*spacing + spacing/2, 15*spacing + spacing/2),
+        '13,15 coordPt');
+
+    ok(!bp.hasCoord(new glift.Point(19, 19)));
+  });
+
+  test('BoardPoints: cropped.', function() {
+    var newflat = glift.flattener.flatten(movetree, {
+      boardRegion: 'BOTTOM_RIGHT'
+    });
+    var bp = glift.flattener.BoardPoints.fromFlattened(newflat, spacing);
+    ok(!bp.hasCoord(new glift.Point(0, 0)));
+    ok(bp.hasCoord(new glift.Point(18, 18)));
+    ok(bp.hasCoord(new glift.Point(7, 8)));
     ok(!bp.hasCoord(new glift.Point(19, 19)));
   });
 

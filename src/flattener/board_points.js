@@ -179,13 +179,13 @@ glift.flattener.BoardPoints.fromBbox = function(bbox, spacing, size) {
   var half = spacing / 2;
   /** @type {!Array<!glift.flattener.BoardPt>} */
   var bpts = [];
-  for (var x = tl.x(); x <= bbox.width(); x++) {
-    for (var y = tl.y(); y <= bbox.height(); y++) {
+  for (var x = tl.x(); x <= br.x(); x++) {
+    for (var y = tl.y(); y <= br.y(); y++) {
       var i = x - tl.x();
       var j = y - tl.y();
       var b = {
         intPt: new glift.Point(x, y),
-        coordPt: new glift.Point(x + half + i*spacing, y + half + j*spacing),
+        coordPt: new glift.Point(half + i*spacing, half + j*spacing),
       };
       bpts.push(b);
     }
