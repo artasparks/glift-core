@@ -46,7 +46,7 @@ glift.flattener.starpoints = {
 
   /**
    * @param {number} size
-   * @return {!Array<!glif.Point>} All the points that should be considered
+   * @return {!Array<!glift.Point>} All the points that should be considered
    * starpoints.
    */
   allPts: function(size) {
