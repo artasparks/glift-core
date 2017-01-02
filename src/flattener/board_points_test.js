@@ -59,16 +59,13 @@
     deepEqual(bp.starPoints(), [
       new glift.Point(3,3),
       new glift.Point(3,9),
+      new glift.Point(6,6),
       new glift.Point(9,3),
-      new glift.Point(9,9),
-      new glift.Point(6,6)]);
+      new glift.Point(9,9)
+      ]);
 
     bp.numIntersections = 9;
     deepEqual(bp.starPoints(), [
-      new glift.Point(2,2),
-      new glift.Point(2,6),
-      new glift.Point(6,2),
-      new glift.Point(6,6),
       new glift.Point(4,4)]);
   });
 })();

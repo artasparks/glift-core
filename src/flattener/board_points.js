@@ -47,12 +47,12 @@ glift.flattener.EdgeLabel;
  * @param {number} spacing
  * @param {!glift.orientation.BoundingBox} intBbox
  * @param {number} numIntersections
- * @param {!Array<glift.flattener.EdgeLabel>=} opt_edgeLabels
+ * @param {!Array<!glift.flattener.EdgeLabel>} edgeLabels
  *
  * @constructor @final @struct
  */
 glift.flattener.BoardPoints = function(
-    points, spacing, intBbox, numIntersections, opt_edgeLabels) {
+    points, spacing, intBbox, numIntersections, edgeLabels) {
   /** @const {!Array<!glift.flattener.BoardPt>} */
   this.points = points;
 
@@ -75,7 +75,7 @@ glift.flattener.BoardPoints = function(
   this.numIntersections = numIntersections;
 
   /** @const {!Array<!glift.flattener.EdgeLabel>} */
-  this.edgeCoordLabels = opt_edgeLabels || [];
+  this.edgeCoordLabels = edgeLabels;
 };
 
 glift.flattener.BoardPoints.prototype = {
@@ -114,17 +114,6 @@ glift.flattener.BoardPoints.prototype = {
   },
 
   /**
-   * Since starpoints are rotationally semmetric, we define an array of arrays
-   * and then determine all combinations of pairs in the inner array.
-   * @private {!Object<number, !Array<!Array<number>>>}
-   */
-  starPointTempl_:  {
-    9 : [[ 2, 6 ], [ 4 ]],
-    13 : [[ 3, 9 ], [6]],
-    19 : [[ 3, 9, 15 ]]
-  },
-
-  /**
    * Return an array on integer points (0-indexed), used to indicate where star
    * points should go. Ex. [(3,3), (3,9), (3,15), ...].  This only returns the
    * points that are actually present in the points mapping.
@@ -132,25 +121,7 @@ glift.flattener.BoardPoints.prototype = {
    * @return {!Array<!glift.Point>}
    */
   starPoints: function() {
-    var point = glift.util.point,
-        // In pts, each element in the sub array is mapped against every other
-        // element.  Thus [2, 6] generates [(2,2), (2,6), (6,2), (6,6)] and
-        // [[2, 6], [4]] generates the above concatinated with [4,4].
-        pts = this.starPointTempl_,
-        outerSet = pts[this.numIntersections] || [],
-        outStarPoints = [];
-    for (var k = 0; k < outerSet.length; k++) {
-      var thisSet = outerSet[k];
-      for (var i = 0; i < thisSet.length; i++) {
-        for (var j = 0; j < thisSet.length; j++) {
-          var pt = point(thisSet[i], thisSet[j]);
-          if (this.hasCoord(pt)) {
-            outStarPoints.push(pt);
-          }
-        }
-      }
-    }
-    return outStarPoints;
+    return glift.flattener.starpoints.allPts(this.numIntersections);
   }
 };
 
@@ -159,16 +130,16 @@ glift.flattener.BoardPoints.prototype = {
  *
  * @param {!glift.flattener.Flattened} flat
  * @param {number} spacing In pt.
- * @param {boolean} opt_withEdgeLabels
+ * @param {boolean} opt_drawBoardCoords
  */
 glift.flattener.BoardPoints.fromFlattened =
-    function(flat, spacing, opt_withEdgeLabels) {
+    function(flat, spacing, opt_drawBoardCoords) {
   var bbox = flat.board().boundingBox();
   return glift.flattener.BoardPoints.fromBbox(
       flat.board().boundingBox(),
       spacing,
       flat.board().maxBoardSize(),
-      !!opt_withEdgeLabels);
+      !!opt_drawBoardCoords);
 };
 
 /**
@@ -176,37 +147,62 @@ glift.flattener.BoardPoints.fromFlattened =
  *
  * @param {glift.orientation.BoundingBox} bbox In intersections. Due to weird
  *    legacy nonsense, we assume that the bounding box has an extra intersection
- *    on all sides (i.e., height/width + 2) if withEdgeLabels is specified.
+ *    on all sides (i.e., height/width + 2) if drawBoardCoords is specified.
  * @param {number} spacing Of the intersections. In pt.
  * @param {number} size
- * @param {boolean} withEdgeLabels
+ * @param {boolean} drawBoardCoords
  * @return {!glift.flattener.BoardPoints}
  */
 glift.flattener.BoardPoints.fromBbox =
-    function(bbox, spacing, size, withEdgeLabels) {
+    function(bbox, spacing, size, drawBoardCoords) {
   var tl = bbox.topLeft();
   var br = bbox.botRight();
+
   var half = spacing / 2;
   /** @type {!Array<!glift.flattener.BoardPt>} */
   var bpts = [];
-  // Note: Convention is to leave off the 'I' coordinate.
-  var xCoordLabels = 'ABCDEFGHJKLMNOPQRSTUVWXYZ';
+  /** @type {!Array<!glift.flattener.EdgeLabel>} */
+  var edgeLabels = [];
 
-  var offset = withEdgeLabels ? 1 : 0;
+  // Note: Convention is to leave off the 'I' coordinate. Note that capital
+  // letters are enough for normal boards.
+  var xCoordLabels = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghjklmnopqrstuvwxyz';
+
+  var offset = drawBoardCoords ? 1 : 0;
   var startX = tl.x();
   var endX = br.x() + 2*offset;
   var startY = tl.y();
   var endY = br.y() + 2*offset;
+
+  var isEdgeX = function(val) { return val === startX || val == endX; }
+  var isEdgeY = function(val) { return val === startY || val == endY; }
+
   for (var x = startX; x <= endX; x++) {
     for (var y = startY; y <= endY; y++) {
       var i = x - startX;
       var j = y - startY;
-      var b = {
-        intPt: new glift.Point(x, y),
-        coordPt: new glift.Point(half + i*spacing, half + j*spacing),
-      };
-      bpts.push(b);
+      var coordPt = new glift.Point(half + i*spacing, half + j*spacing);
+      if (drawBoardCoords && (isEdgeX(x) || isEdgeY(y))) {
+        if (isEdgeX(x) && isEdgeY(y)) {
+          // This is a corner; no coords here.
+        }
+        var label = '';
+        if (isEdgeX(x)) {
+          label = xCoordLabels[x];
+        } else {
+          label = (startY + 1) + '';
+        }
+        edgeLabels.push({
+          label: label,
+          coordPt: coordPt,
+        });
+      } else {
+        bpts.push({
+          intPt: new glift.Point(x + offset, y + offset),
+          coordPt: coordPt,
+        });
+      }
     }
   }
-  return new glift.flattener.BoardPoints(bpts, spacing, bbox, size);
+  return new glift.flattener.BoardPoints(bpts, spacing, bbox, size, edgeLabels);
 };
