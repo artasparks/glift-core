@@ -32,7 +32,19 @@ glift.flattener.EdgeLabel;
  *
  * @typedef {{
  *  drawBoardCoords: (boolean|undefined),
+ *  padding: (number|undefined),
+ *  raggedEdgePadding: (number|undefined),
  * }}
+ *
+ * drawBoardCoords: whether to draw the board coordinates:
+ * padding: Amount of extra spacing around the edge of the board. As a fraction
+ *    of an intersection. Defaults to zero.
+ *    Examule: If padding = 0.75 and spacing = 20, then the actual
+ *    padding around each edge will be 15.
+ * raggedEdgePadding: Like padding, extra amount of spacing around the edge of
+ *    the board as a fraction of an intersection, which defaults to zero. This
+ *    only applies to ragged (cropped) sides and lives between the
+ *    board-intersections and the
  */
 glift.flattener.BoardPointsOptions;
 
@@ -62,7 +74,7 @@ glift.flattener.BoardPointsOptions;
  * @constructor @final @struct
  */
 glift.flattener.BoardPoints = function(
-    points, spacing, intBbox, numIntersections, edgeLabels) {
+    points, spacing, intBbox, coordBbox, numIntersections, edgeLabels) {
   /** @const {!Array<!glift.flattener.BoardPt>} */
   this.points = points;
 
@@ -78,8 +90,17 @@ glift.flattener.BoardPoints = function(
   /** @const {number} */
   this.radius = spacing / 2;
 
-  /** @const {!glift.orientation.BoundingBox} */
+  /**
+   * Bounding box for the intersections.
+   * @const {!glift.orientation.BoundingBox}
+   */
   this.intBbox = intBbox;
+
+  /**
+   * Coordinate bounding box.
+   * @const {!glift.orientation.BoundingBox}
+   */
+  this.coordBbox = coordBbox;
 
   /** @const {number} */
   this.numIntersections = numIntersections;
@@ -156,9 +177,8 @@ glift.flattener.BoardPoints.fromFlattened =
 /**
  * Creates a board points wrapper.
  *
- * @param {glift.orientation.BoundingBox} bbox In intersections. Due to weird
- *    legacy nonsense, we assume that the bounding box has an extra intersection
- *    on all sides (i.e., height/width + 2) if drawBoardCoords is specified.
+ * @param {glift.orientation.BoundingBox} bbox In intersections. For a typical board,
+ *    TL is 0,0 and BR is 18,18.
  * @param {number} spacing Of the intersections. In pt.
  * @param {number} size
  * @param {!glift.flattener.BoardPointsOptions} opts
@@ -176,6 +196,15 @@ glift.flattener.BoardPoints.fromBbox =
   var edgeLabels = [];
 
   var drawBoardCoords = !!opts.drawBoardCoords;
+  var paddingFrac = opts.padding || 0;
+  var paddingAmt = paddingFrac * spacing;
+  var raggedEdgePaddingFrac = opts.raggedEdgePadding || 0;
+  var raggedAmt = raggedEdgePaddingFrac * spacing;
+
+  var raggedLeft = tl.x() === 0 ? 0 : raggedAmt;
+  var raggedRight = br.x() === size-1 ? 0 : raggedAmt;
+  var raggedTop = tl.y() === 0 ? 0 : raggedAmt;
+  var raggedBottom = br.y() === size-1 ? 0 : raggedAmt;
 
   // Note: Convention is to leave off the 'I' coordinate. Note that capital
   // letters are enough for normal boards.
@@ -187,6 +216,12 @@ glift.flattener.BoardPoints.fromBbox =
   var startY = tl.y();
   var endY = br.y() + 2*offset;
 
+  var coordBbox = new glift.orientation.BoundingBox(
+    new glift.Point(0,0),
+    new glift.Point(
+        (endX-startX)*spacing + spacing + 2*paddingAmt + raggedLeft + raggedRight,
+        (endY-startY)*spacing + spacing + 2*paddingAmt + raggedTop + raggedBottom));
+
   var isEdgeX = function(val) { return val === startX || val === endX; }
   var isEdgeY = function(val) { return val === startY || val === endY; }
 
@@ -194,18 +229,26 @@ glift.flattener.BoardPoints.fromBbox =
     for (var y = startY; y <= endY; y++) {
       var i = x - startX;
       var j = y - startY;
-      var coordPt = new glift.Point(half + i*spacing, half + j*spacing);
+      var coordPt = new glift.Point(
+          half + i*spacing + paddingAmt + raggedLeft,
+          half + j*spacing + paddingAmt + raggedTop);
 
       if (drawBoardCoords && (isEdgeX(x) || isEdgeY(y))) {
         if (isEdgeX(x) && isEdgeY(y)) {
           // This is a corner; no coords here.
           continue;
         }
+
+        if (raggedLeft && i === 0) { coordPt = coordPt.translate(-raggedLeft, 0); }
+        if (raggedRight && x === endX) { coordPt = coordPt.translate(raggedRight, 0); }
+        if (raggedTop && j === 0) { coordPt = coordPt.translate(0, -raggedTop); }
+        if (raggedBottom && y === endY) { coordPt = coordPt.translate(0, raggedBottom); }
+
         var label = '';
         if (isEdgeY(y)) {
           label = xCoordLabels[x-1];
         } else if (isEdgeX(x)) {
-          label = y + '';
+          label = (size-y+1) + '';
         } else {
           throw new Error('Yikes! Should not happen! pt:' + x + ',' + y);
         }
@@ -214,6 +257,7 @@ glift.flattener.BoardPoints.fromBbox =
           coordPt: coordPt,
         });
       } else {
+
         bpts.push({
           intPt: new glift.Point(x - offset, y - offset),
           coordPt: coordPt,
@@ -221,5 +265,11 @@ glift.flattener.BoardPoints.fromBbox =
       }
     }
   }
-  return new glift.flattener.BoardPoints(bpts, spacing, bbox, size, edgeLabels);
+  return new glift.flattener.BoardPoints(
+      bpts,
+      spacing,
+      bbox,
+      coordBbox,
+      size,
+      edgeLabels);
 };
