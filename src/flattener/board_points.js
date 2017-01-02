@@ -26,6 +26,16 @@ glift.flattener.BoardPt;
  */
 glift.flattener.EdgeLabel;
 
+
+/**
+ * Options for creating a BoardPoints instance.
+ *
+ * @typedef {{
+ *  drawBoardCoords: (boolean|undefined),
+ * }}
+ */
+glift.flattener.BoardPointsOptions;
+
 /**
  * BoardPoints is a helper for actually rendering the board when pixel
  * representations are required.
@@ -75,7 +85,7 @@ glift.flattener.BoardPoints = function(
   this.numIntersections = numIntersections;
 
   /** @const {!Array<!glift.flattener.EdgeLabel>} */
-  this.edgeCoordLabels = edgeLabels;
+  this.edgeLabels = edgeLabels;
 };
 
 glift.flattener.BoardPoints.prototype = {
@@ -130,16 +140,17 @@ glift.flattener.BoardPoints.prototype = {
  *
  * @param {!glift.flattener.Flattened} flat
  * @param {number} spacing In pt.
- * @param {boolean} opt_drawBoardCoords
+ * @param {glift.flattener.BoardPointsOptions=} opt_options
  */
 glift.flattener.BoardPoints.fromFlattened =
-    function(flat, spacing, opt_drawBoardCoords) {
+    function(flat, spacing, opt_options) {
+  var opts = opt_options || {};
   var bbox = flat.board().boundingBox();
   return glift.flattener.BoardPoints.fromBbox(
-      flat.board().boundingBox(),
+      bbox,
       spacing,
       flat.board().maxBoardSize(),
-      !!opt_drawBoardCoords);
+      opts);
 };
 
 /**
@@ -150,11 +161,11 @@ glift.flattener.BoardPoints.fromFlattened =
  *    on all sides (i.e., height/width + 2) if drawBoardCoords is specified.
  * @param {number} spacing Of the intersections. In pt.
  * @param {number} size
- * @param {boolean} drawBoardCoords
+ * @param {!glift.flattener.BoardPointsOptions} opts
  * @return {!glift.flattener.BoardPoints}
  */
 glift.flattener.BoardPoints.fromBbox =
-    function(bbox, spacing, size, drawBoardCoords) {
+    function(bbox, spacing, size, opts) {
   var tl = bbox.topLeft();
   var br = bbox.botRight();
 
@@ -163,6 +174,8 @@ glift.flattener.BoardPoints.fromBbox =
   var bpts = [];
   /** @type {!Array<!glift.flattener.EdgeLabel>} */
   var edgeLabels = [];
+
+  var drawBoardCoords = !!opts.drawBoardCoords;
 
   // Note: Convention is to leave off the 'I' coordinate. Note that capital
   // letters are enough for normal boards.
@@ -174,23 +187,27 @@ glift.flattener.BoardPoints.fromBbox =
   var startY = tl.y();
   var endY = br.y() + 2*offset;
 
-  var isEdgeX = function(val) { return val === startX || val == endX; }
-  var isEdgeY = function(val) { return val === startY || val == endY; }
+  var isEdgeX = function(val) { return val === startX || val === endX; }
+  var isEdgeY = function(val) { return val === startY || val === endY; }
 
   for (var x = startX; x <= endX; x++) {
     for (var y = startY; y <= endY; y++) {
       var i = x - startX;
       var j = y - startY;
       var coordPt = new glift.Point(half + i*spacing, half + j*spacing);
+
       if (drawBoardCoords && (isEdgeX(x) || isEdgeY(y))) {
         if (isEdgeX(x) && isEdgeY(y)) {
           // This is a corner; no coords here.
+          continue;
         }
         var label = '';
-        if (isEdgeX(x)) {
-          label = xCoordLabels[x];
+        if (isEdgeY(y)) {
+          label = xCoordLabels[x-1];
+        } else if (isEdgeX(x)) {
+          label = y + '';
         } else {
-          label = (startY + 1) + '';
+          throw new Error('Yikes! Should not happen! pt:' + x + ',' + y);
         }
         edgeLabels.push({
           label: label,
@@ -198,7 +215,7 @@ glift.flattener.BoardPoints.fromBbox =
         });
       } else {
         bpts.push({
-          intPt: new glift.Point(x + offset, y + offset),
+          intPt: new glift.Point(x - offset, y - offset),
           coordPt: coordPt,
         });
       }

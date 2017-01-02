@@ -4,6 +4,7 @@
   var movetree = glift.rules.movetree.getFromSgf(basicSgf);
   var flat = glift.flattener.flatten(movetree);
   var spacing = 20; // pixels? mm? I dunno.
+  var half = spacing / 2;
 
   test('BoardPoints Construction: normal full board.', function() {
     var bp = glift.flattener.BoardPoints.fromFlattened(flat, spacing);
@@ -13,18 +14,18 @@
 
     ok(bp.hasCoord(new glift.Point(0, 0)));
     deepEqual(bp.getCoord(new glift.Point(0, 0)).coordPt,
-        new glift.Point(spacing/2, spacing/2), 'Zero coordPt');
+        new glift.Point(half, half), 'Zero coordPt');
 
     ok(bp.hasCoord(new glift.Point(18, 18)));
     deepEqual(bp.getCoord(new glift.Point(18, 18)).coordPt,
-        new glift.Point(18*spacing + spacing/2, 18*spacing + spacing/2),
+        new glift.Point(18*spacing + half, 18*spacing + half),
         '18,18 coordPt');
 
     ok(bp.hasCoord(new glift.Point(13, 15)));
     deepEqual(bp.getCoord(new glift.Point(13, 15)).intPt,
         new glift.Point(13,15));
     deepEqual(bp.getCoord(new glift.Point(13, 15)).coordPt,
-        new glift.Point(13*spacing + spacing/2, 15*spacing + spacing/2),
+        new glift.Point(13*spacing + half, 15*spacing + half),
         '13,15 coordPt');
 
     ok(!bp.hasCoord(new glift.Point(19, 19)));
@@ -67,5 +68,44 @@
     bp.numIntersections = 9;
     deepEqual(bp.starPoints(), [
       new glift.Point(4,4)]);
+  });
+
+  test('BoardPoints: drawBoardCoords.', function() {
+    var bp = glift.flattener.BoardPoints.fromFlattened(flat, spacing, {
+      drawBoardCoords: true
+    });
+    ok(bp);
+    deepEqual(bp.edgeLabels.length, 19 * 4);
+    deepEqual(bp.edgeLabels[0],
+      { label: '1', coordPt: new glift.Point(half, spacing + half) });
+    deepEqual(bp.edgeLabels[18],
+      { label: '19', coordPt: new glift.Point(half, 19*spacing + half) });
+    deepEqual(bp.edgeLabels[19],
+      { label: 'A', coordPt: new glift.Point(spacing + half, half) });
+    deepEqual(bp.edgeLabels[20],
+      { label: 'A', coordPt: new glift.Point(spacing + half, spacing*20 + half) });
+    deepEqual(bp.edgeLabels[19*3],
+      { label: '1', coordPt: new glift.Point(spacing*20 + half, spacing + half) });
+    deepEqual(bp.edgeLabels[19*4-1],
+      { label: '19', coordPt: new glift.Point(spacing*20 + half, spacing*19 + half) });
+
+    ok(bp.hasCoord(new glift.Point(0, 0)));
+    deepEqual(bp.getCoord(new glift.Point(0, 0)).coordPt,
+        new glift.Point(spacing + half, spacing + half), 'Zero coordPt');
+
+    ok(bp.hasCoord(new glift.Point(18, 18)));
+    deepEqual(bp.getCoord(new glift.Point(18, 18)).coordPt,
+        new glift.Point(19*spacing + half, 19*spacing + half),
+        '18,18 coordPt');
+  });
+
+  test('BoardPoints: drawBoardCoords, cropped', function() {
+    var newflat = glift.flattener.flatten(movetree, {
+      boardRegion: 'BOTTOM_RIGHT'
+    });
+    var bp = glift.flattener.BoardPoints.fromFlattened(newflat, spacing, {
+      drawBoardCoords: true
+    });
+    ok(bp);
   });
 })();
