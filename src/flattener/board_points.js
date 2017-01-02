@@ -159,30 +159,48 @@ glift.flattener.BoardPoints.prototype = {
  *
  * @param {!glift.flattener.Flattened} flat
  * @param {number} spacing In pt.
+ * @param {boolean} opt_withEdgeLabels
  */
-glift.flattener.BoardPoints.fromFlattened = function(flat, spacing) {
+glift.flattener.BoardPoints.fromFlattened =
+    function(flat, spacing, opt_withEdgeLabels) {
+  var bbox = flat.board().boundingBox();
   return glift.flattener.BoardPoints.fromBbox(
-      flat.board().boundingBox(), spacing, flat.board().maxBoardSize());
+      flat.board().boundingBox(),
+      spacing,
+      flat.board().maxBoardSize(),
+      !!opt_withEdgeLabels);
 };
 
 /**
  * Creates a board points wrapper.
  *
- * @param {glift.orientation.BoundingBox} bbox In intersections
+ * @param {glift.orientation.BoundingBox} bbox In intersections. Due to weird
+ *    legacy nonsense, we assume that the bounding box has an extra intersection
+ *    on all sides (i.e., height/width + 2) if withEdgeLabels is specified.
  * @param {number} spacing Of the intersections. In pt.
  * @param {number} size
+ * @param {boolean} withEdgeLabels
  * @return {!glift.flattener.BoardPoints}
  */
-glift.flattener.BoardPoints.fromBbox = function(bbox, spacing, size) {
+glift.flattener.BoardPoints.fromBbox =
+    function(bbox, spacing, size, withEdgeLabels) {
   var tl = bbox.topLeft();
   var br = bbox.botRight();
   var half = spacing / 2;
   /** @type {!Array<!glift.flattener.BoardPt>} */
   var bpts = [];
-  for (var x = tl.x(); x <= br.x(); x++) {
-    for (var y = tl.y(); y <= br.y(); y++) {
-      var i = x - tl.x();
-      var j = y - tl.y();
+  // Note: Convention is to leave off the 'I' coordinate.
+  var xCoordLabels = 'ABCDEFGHJKLMNOPQRSTUVWXYZ';
+
+  var offset = withEdgeLabels ? 1 : 0;
+  var startX = tl.x();
+  var endX = br.x() + 2*offset;
+  var startY = tl.y();
+  var endY = br.y() + 2*offset;
+  for (var x = startX; x <= endX; x++) {
+    for (var y = startY; y <= endY; y++) {
+      var i = x - startX;
+      var j = y - startY;
       var b = {
         intPt: new glift.Point(x, y),
         coordPt: new glift.Point(half + i*spacing, half + j*spacing),
