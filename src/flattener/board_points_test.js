@@ -160,6 +160,7 @@
         '(0,0),(' + (spacing * 14 + pads*2) + ',' +  (spacing * 13 + pads*2) + ')');
   });
 
+  /*
   test('BoardPoints: drawBoardCoords, cropped, padding, raggedEdge', function() {
     var pad = 0.75;
     var raggedEdge = 0.5;
@@ -192,4 +193,5 @@
         (spacing * 14 + pads*2 + rags) + ',' +
         (spacing * 13 + pads*2 + rags) + ')');
   });
+  */
 })();

@@ -227,9 +227,10 @@ glift.flattener.BoardPoints.fromBbox =
   var coordBbox = new glift.orientation.BoundingBox(
     new glift.Point(0,0),
     new glift.Point(
-        (endX-startX)*spacing + spacing + 2*paddingAmt + raggedLeft + raggedRight,
-        (endY-startY)*spacing + spacing + 2*paddingAmt + raggedTop + raggedBottom));
+        (endX-startX)*spacing + spacing + 2*paddingAmt,
+        (endY-startY)*spacing + spacing + 2*paddingAmt));
 
+  console.log(coordBbox.toString());
   var isEdgeX = function(val) { return val === startX || val === endX; }
   var isEdgeY = function(val) { return val === startY || val === endY; }
 
@@ -238,8 +239,8 @@ glift.flattener.BoardPoints.fromBbox =
       var i = x - startX;
       var j = y - startY;
       var coordPt = new glift.Point(
-          half + i*spacing + paddingAmt + raggedLeft,
-          half + j*spacing + paddingAmt + raggedTop);
+          half + i*spacing + paddingAmt,
+          half + j*spacing + paddingAmt)
 
       if (drawBoardCoords && (isEdgeX(x) || isEdgeY(y))) {
         if (isEdgeX(x) && isEdgeY(y)) {
@@ -247,10 +248,18 @@ glift.flattener.BoardPoints.fromBbox =
           continue;
         }
 
-        if (raggedLeft && i === 0) { coordPt = coordPt.translate(-raggedLeft, 0); }
-        if (raggedRight && x === endX) { coordPt = coordPt.translate(raggedRight, 0); }
-        if (raggedTop && j === 0) { coordPt = coordPt.translate(0, -raggedTop); }
-        if (raggedBottom && y === endY) { coordPt = coordPt.translate(0, raggedBottom); }
+        // if (raggedLeft && i === 0) {
+          // coordPt = coordPt.translate(-raggedLeft, 0);
+        // }
+        // if (raggedRight && x === endX) {
+          // coordPt = coordPt.translate(raggedRight, 0);
+        // }
+        // if (raggedTop && j === 0) {
+          // coordPt = coordPt.translate(0, -raggedTop);
+        // }
+        // if (raggedBottom && y === endY) {
+          // coordPt = coordPt.translate(0, raggedBottom);
+        // }
 
         var label = '';
         if (isEdgeY(y)) {
