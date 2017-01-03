@@ -152,7 +152,15 @@ glift.flattener.BoardPoints.prototype = {
    * @return {!Array<!glift.Point>}
    */
   starPoints: function() {
-    return glift.flattener.starpoints.allPts(this.numIntersections);
+    var sp = glift.flattener.starpoints.allPts(this.numIntersections);
+    var out = [];
+    for (var i = 0; i < sp.length; i++) {
+      var p = sp[i];
+      if (this.hasCoord(p)) {
+        out.push(p);
+      }
+    }
+    return out;
   }
 };
 

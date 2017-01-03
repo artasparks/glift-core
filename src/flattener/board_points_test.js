@@ -76,6 +76,21 @@
       new glift.Point(4,4)]);
   });
 
+
+  test('BoardPoints: star points, cropped', function() {
+    var newflat = glift.flattener.flatten(movetree, {
+      boardRegion: 'RIGHT'
+    });
+    var bp = glift.flattener.BoardPoints.fromFlattened(newflat, spacing);
+    deepEqual(bp.starPoints(), [
+      new glift.Point(9,3),
+      new glift.Point(9,9),
+      new glift.Point(9,15),
+      new glift.Point(15,3),
+      new glift.Point(15,9),
+      new glift.Point(15,15)]);
+  });
+
   test('BoardPoints: drawBoardCoords.', function() {
     var bp = glift.flattener.BoardPoints.fromFlattened(flat, spacing, {
       drawBoardCoords: true
