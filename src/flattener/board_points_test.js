@@ -159,4 +159,16 @@
     deepEqual(bp.coordBbox.toString(),
         '(0,0),(' + (spacing * 14 + pads*2) + ',' +  (spacing * 13 + pads*2) + ')');
   });
+
+  test('BoardPoints: offsetPt', function() {
+    var pt = new glift.Point(12, 32);
+    var bp = glift.flattener.BoardPoints.fromFlattened(flat, spacing, {
+      offsetPt: pt,
+    });
+    ok(bp.hasCoord(new glift.Point(18, 18)));
+    deepEqual(
+        bp.getCoord(new glift.Point(18, 18)).coordPt,
+        new glift.Point(18*spacing + half + pt.x(), 18*spacing + half + pt.y()),
+        '18,18 coordPt');
+  });
 })();
