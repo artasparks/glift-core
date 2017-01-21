@@ -20,7 +20,7 @@ glift.PtStr;
  * Create a point.  We no longer cache points
  * @param {number} x
  * @param {number} y
- * return {!glift.Point}
+ * @return {!glift.Point}
  */
 glift.util.point = function(x, y) {
   return new glift.Point(x, y);
@@ -29,7 +29,7 @@ glift.util.point = function(x, y) {
 /**
  * @param {number} x
  * @param {number} y
- * return {!glift.PtStr}
+ * @return {!glift.PtStr}
  */
 glift.util.coordToString = function(x, y) {
   return x + ',' + y;
@@ -111,7 +111,7 @@ glift.util.pointFromSgfCoord = function(str) {
     throw 'Unknown SGF Coord length: ' + str.length +
         'for property ' + str;
   }
-  var a = 'a'.charCodeAt(0)
+  var a = 'a'.charCodeAt(0);
   return glift.util.point(str.charCodeAt(0) - a, str.charCodeAt(1) - a);
 };
 
