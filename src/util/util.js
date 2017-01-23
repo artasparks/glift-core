@@ -75,6 +75,9 @@ glift.util = {
 
   /**
    * Set methods in the base object.  Usually used in conjunction with beget.
+   * @param {!Object} base
+   * @param {!Object} methods
+   * @return {!Object}
    */
   setMethods: function(base, methods) {
     for (var key in methods) {
