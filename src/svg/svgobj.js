@@ -136,7 +136,9 @@ glift.svg.SvgObj.prototype = {
           vb.tlY + ' ' +
           vb.brX + ' ' +
           vb.brY + '"';
-          // ' preserveAspectRatio="xMidYMidmeet"';
+      if (!this.attrMap_['preserveAspectRatio']) {
+        base += ' preserveAspectRatio="xMidYMid"'
+      }
     }
     base += '>' + this.text_;
     if (this.style_) {
