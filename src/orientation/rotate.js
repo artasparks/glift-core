@@ -1,6 +1,7 @@
 goog.provide('glift.orientation.AutoRotatePrefs');
 
 /**
+ * What are the preferred cropping-regions.
  * @typedef {{
  *  corner: glift.enums.boardRegions,
  *  side: glift.enums.boardRegions,
@@ -9,9 +10,8 @@ goog.provide('glift.orientation.AutoRotatePrefs');
 glift.orientation.AutoRotatePrefs;
 
 /**
- * Automatically calculates the desired rotation for a movetree, based on
- * rotation preferences and the movetrees quad-crop. Returns one of
- * glift.enums.rotations.
+ * Calculates the desired rotation for a movetree, based on rotation
+ * preferences and the movetrees quad-crop.
  *
  * Region ordering should specify what regions the rotation algorithm should
  * target. If not specified, defaults to TOP_RIGHT / TOP.
@@ -23,7 +23,7 @@ glift.orientation.AutoRotatePrefs;
  * @param {!glift.orientation.AutoRotatePrefs=} opt_prefs
  * @return {!glift.enums.rotations} The rotation that should be performed.
  */
-glift.orientation.autoRotate = function(movetree, opt_prefs) {
+glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
   var boardRegions = glift.enums.boardRegions;
   var rotations = glift.enums.rotations;
   var cornerRegions = {
