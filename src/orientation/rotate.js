@@ -10,6 +10,17 @@ goog.provide('glift.orientation.AutoRotatePrefs');
 glift.orientation.AutoRotatePrefs;
 
 /**
+ * Automatically rotate a movetree. Relies on findCanonicalRotation to find the
+ * correct orientation.
+ */
+glift.orientation.autoRotate = function(movetree, opt_prefs) {
+  var nmt = movetree.newTreeRef();
+  var rotation = glift.orientation.findCanonicalRotation(movetree, opt_prefs);
+  // TODO(kashomon): Use glift.rules.properties.prototype.rotate on all props.
+  return nmt;
+};
+
+/**
  * Calculates the desired rotation for a movetree, based on rotation
  * preferences and the movetrees quad-crop.
  *
