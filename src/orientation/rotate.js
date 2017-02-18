@@ -32,9 +32,12 @@ glift.orientation.autoRotate = function(movetree, opt_prefs) {
  *
  * @param {!glift.rules.MoveTree} movetree
  * @param {!glift.orientation.AutoRotatePrefs=} opt_prefs
+ * @param {!(glift.rules.Treepath|string)=} opt_nextMovesPath
+ *    Optional next moves path for cropping along a specific path.
  * @return {!glift.enums.rotations} The rotation that should be performed.
  */
-glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
+glift.orientation.findCanonicalRotation =
+    function(movetree, opt_prefs, opt_nextMovesPath) {
   var boardRegions = glift.enums.boardRegions;
   var rotations = glift.enums.rotations;
   var cornerRegions = {
@@ -58,7 +61,8 @@ glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
     };
   }
 
-  var region = glift.orientation.getQuadCropFromMovetree(movetree);
+  var region = glift.orientation.getQuadCropFromMovetree(
+      movetree, opt_nextMovesPath);
 
   if (cornerRegions[region] !== undefined ||
       sideRegions[region] !== undefined) {
