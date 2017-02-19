@@ -17,6 +17,9 @@ glift.orientation.AutoRotatePrefs;
  * correct orientation.
  *
  * Size is determined by examining the sz property of the game.
+ * @param {!glift.rules.MoveTree} movetree
+ * @param {!glift.orientation.AutoRotatePrefs=} opt_prefs
+ * @return {!glift.rules.MoveTree}
  */
 glift.orientation.autoRotate = function(movetree, opt_prefs) {
   var nmt = movetree.newTreeRef();
