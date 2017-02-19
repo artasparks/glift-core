@@ -1,7 +1,10 @@
 goog.provide('glift.orientation.AutoRotatePrefs');
 
 /**
- * What are the preferred cropping-regions.
+ * Options for cropping
+ * - What are the preferred cropping-regions.
+ *
+ *
  * @typedef {{
  *  corner: glift.enums.boardRegions,
  *  side: glift.enums.boardRegions,
@@ -12,11 +15,19 @@ glift.orientation.AutoRotatePrefs;
 /**
  * Automatically rotate a movetree. Relies on findCanonicalRotation to find the
  * correct orientation.
+ *
+ * Size is determined by examining the sz property of the game.
  */
 glift.orientation.autoRotate = function(movetree, opt_prefs) {
   var nmt = movetree.newTreeRef();
   var rotation = glift.orientation.findCanonicalRotation(movetree, opt_prefs);
-  // TODO(kashomon): Use glift.rules.properties.prototype.rotate on all props.
+  nmt.recurseFromRoot(function(mt) {
+    var props = mt.properties();
+    props.forEach(function(prop, vals) {
+      var size = movetree.getIntersections();
+      props.rotate(prop, size, rotation);
+    });
+  });
   return nmt;
 };
 
