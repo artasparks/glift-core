@@ -46,9 +46,10 @@ glift.flattener = {};
  *  nextMovesPath: (!glift.rules.Treepath|string|!Array<number>|undefined),
  *  startingMoveNum: (number|undefined),
  *  boardRegion: (glift.enums.boardRegions|undefined),
+ *  autoBoxCropOnNextMoves: (boolean|undefined),
+ *  autoRotateCropPrefs: (!glift.orientation.AutoRotateCropPrefs|undefined),
  *  regionRestrictions: (!Array<glift.enums.boardRegions>|undefined),
  *  showNextVariationsType: (glift.enums.showVariations|undefined),
- *  autoBoxCropOnNextMoves: (boolean|undefined),
  *  markLastMove: (boolean|undefined),
  *  selectedNextMove: (?glift.rules.Move|undefined),
  *  showKoLocation: (boolean|undefined),
@@ -100,6 +101,12 @@ glift.flattener.flatten = function(movetreeInitial, opt_options) {
   // Create a new ref to avoid changing original tree ref.
   var mt = movetreeInitial.newTreeRef();
   var options = opt_options || {};
+
+  // Auto-rotate must happen first, since most that follows depends on a fixed
+  // orientation.
+  if (options.autoRotateCropPrefs) {
+    mt = glift.orientation.autoRotateCrop(mt, options.autoRotateCropPrefs);
+  }
 
   if (options.initPosition !== undefined) {
     var initPos = glift.rules.treepath.parseInitialPath(options.initPosition || '');
