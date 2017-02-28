@@ -194,6 +194,7 @@ glift.Point.prototype = {
    * @param {number} maxIntersections The max intersections of the uncropped
    *    board. Typically 19, 13, or 9.
    * @param {glift.enums.rotations} rotation To perform on the point.
+   *
    * @return {!glift.Point} A new point that has possibly been rotated.
    */
   rotate: function(maxIntersections, rotation) {
@@ -203,9 +204,10 @@ glift.Point.prototype = {
         rotation === rotations.NO_ROTATION) {
       return this;
     }
+
     var point = glift.util.point;
-    var mid = (maxIntersections - 1) / 2;
-    var normalized = point(this.x() - mid, mid - this.y());
+
+    var normalized = this.normalize(maxIntersections);
 
     if (glift.util.outBounds(this.x(), maxIntersections) ||
         glift.util.outBounds(this.x(), maxIntersections)) {
@@ -224,8 +226,7 @@ glift.Point.prototype = {
       rotated = point(-normalized.y(), normalized.x());
     }
 
-    // renormalize
-    return point(mid + rotated.x(), -rotated.y() + mid);
+    return rotated.denormalize(maxIntersections);
   },
 
   /**
@@ -245,5 +246,52 @@ glift.Point.prototype = {
     } else {
       return this.rotate(maxIntersections, rotation);
     }
+  },
+
+  /**
+   * Flip over the X axis (so flip Y points).
+   * @param {number} ints Usually 9, 13, or 19
+   * @return {!glift.Point}
+   */
+  flipVert: function(ints) {
+    if (!ints) {
+      throw new Error('The board size (ints) must be defined.');
+    }
+    var n = this.normalize(ints);
+    return glift.util.point(n.x(), -n.y()).denormalize(ints);
+  },
+
+  /**
+   * Flip over the Y axis (so flip X points).
+   * @param {number} ints Usually 9, 13, or 19
+   * @return {!glift.Point}
+   */
+  flipHorz: function(ints) {
+    if (!ints) {
+      throw new Error('The board size (ints) must be defined.');
+    }
+    var n = this.normalize(ints);
+    return glift.util.point(-n.x(), n.y()).denormalize(ints);
+  },
+
+
+  /**
+   * Makes the 0,0 point in the very center of the board.
+   * @param {number} ints Usually 9, 13, or 19
+   * @return {!glift.Point}
+   */
+  normalize: function(ints) {
+    var mid = (ints - 1) / 2;
+    return glift.util.point(this.x() - mid, mid - this.y());
+  },
+
+  /**
+   * Makes the 0,0 point in the top left, like normal.
+   * @param {number} ints Usually 9, 13, or 19
+   * @return {!glift.Point}
+   */
+  denormalize: function(ints) {
+    var mid = (ints - 1) / 2;
+    return glift.util.point(mid + this.x(), -this.y() + mid);
   },
 };

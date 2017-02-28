@@ -2,8 +2,7 @@ goog.provide('glift.orientation.AutoRotateCropPrefs');
 
 /**
  * Options for cropping
- * - What are the preferred cropping-regions.
- *
+ * - What are the destination cropping-regions?
  *
  * @typedef {{
  *  corner: glift.enums.boardRegions,
@@ -31,7 +30,7 @@ glift.orientation.autoRotateCrop = function(movetree, opt_prefs) {
       props.rotate(prop, size, rotation);
     });
   });
-  return nmt;
+  return nmt.getTreeFromRoot();
 };
 
 /**
