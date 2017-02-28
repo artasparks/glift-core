@@ -72,4 +72,46 @@
     });
     deepEqual(nmt.properties().getAsPoint('B'),  pt(1, 16));
   });
+
+  test('Autorotate: corner, flip', function() {
+    var pt = glift.util.point;
+    var mt = glift.rules.movetree.getFromSgf(
+      '(;GM[1]B[cb]C[foo];W[ac])');
+    deepEqual(mt.properties().getAsPoint('B'),  pt(2, 1));
+
+    // Should be no flip
+    var nmt = glift.orientation.autoRotateCrop(mt, {
+      corner: boardRegions.TOP_LEFT,
+      side: boardRegions.TOP,
+      preferFlips: true,
+    });
+    deepEqual(nmt.properties().getAsPoint('B'),  pt(2, 1));
+    deepEqual(nmt.properties().getOneValue('C'), 'foo');
+
+    // Horizontal flip
+    mt = glift.rules.movetree.getFromSgf(
+      '(;GM[1]B[cb]C[foo];W[ac])');
+    nmt = glift.orientation.autoRotateCrop(mt, {
+      corner: boardRegions.TOP_RIGHT,
+      side: boardRegions.TOP,
+      preferFlips: true,
+    });
+    deepEqual(nmt.properties().getAsPoint('B'),  pt(16, 1));
+    deepEqual(nmt.properties().getOneValue('C'), 'foo');
+    nmt.moveDown();
+    deepEqual(nmt.properties().getAsPoint('W'),  pt(18, 2));
+
+    // Vertical flip
+    mt = glift.rules.movetree.getFromSgf(
+      '(;GM[1]B[cb]C[foo];W[ac])');
+    nmt = glift.orientation.autoRotateCrop(mt, {
+      corner: boardRegions.BOTTOM_LEFT,
+      side: boardRegions.TOP,
+      preferFlips: true,
+    });
+    deepEqual(nmt.properties().getAsPoint('B'),  pt(2, 17));
+    deepEqual(nmt.properties().getOneValue('C'), 'foo');
+    nmt.moveDown();
+    deepEqual(nmt.properties().getAsPoint('W'),  pt(0, 16));
+  });
 })();

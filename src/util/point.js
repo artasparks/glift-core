@@ -250,48 +250,48 @@ glift.Point.prototype = {
 
   /**
    * Flip over the X axis (so flip Y points).
-   * @param {number} ints Usually 9, 13, or 19
+   * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  flipVert: function(ints) {
-    if (!ints) {
-      throw new Error('The board size (ints) must be defined.');
+  flipVert: function(size) {
+    if (!size) {
+      throw new Error('The board size must be defined. Was:' + size);
     }
-    var n = this.normalize(ints);
-    return glift.util.point(n.x(), -n.y()).denormalize(ints);
+    var n = this.normalize(size);
+    return glift.util.point(n.x(), -n.y()).denormalize(size);
   },
 
   /**
    * Flip over the Y axis (so flip X points).
-   * @param {number} ints Usually 9, 13, or 19
+   * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  flipHorz: function(ints) {
-    if (!ints) {
-      throw new Error('The board size (ints) must be defined.');
+  flipHorz: function(size) {
+    if (!size) {
+      throw new Error('The board size must be defined. Was:' + size);
     }
-    var n = this.normalize(ints);
-    return glift.util.point(-n.x(), n.y()).denormalize(ints);
+    var n = this.normalize(size);
+    return glift.util.point(-n.x(), n.y()).denormalize(size);
   },
 
 
   /**
    * Makes the 0,0 point in the very center of the board.
-   * @param {number} ints Usually 9, 13, or 19
+   * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  normalize: function(ints) {
-    var mid = (ints - 1) / 2;
+  normalize: function(size) {
+    var mid = (size - 1) / 2;
     return glift.util.point(this.x() - mid, mid - this.y());
   },
 
   /**
    * Makes the 0,0 point in the top left, like normal.
-   * @param {number} ints Usually 9, 13, or 19
+   * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  denormalize: function(ints) {
-    var mid = (ints - 1) / 2;
+  denormalize: function(size) {
+    var mid = (size - 1) / 2;
     return glift.util.point(mid + this.x(), -this.y() + mid);
   },
 };

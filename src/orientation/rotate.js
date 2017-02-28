@@ -3,10 +3,14 @@ goog.provide('glift.orientation.AutoRotateCropPrefs');
 /**
  * Options for cropping
  * - What are the destination cropping-regions?
+ * - Should the points be flipped over the X or Y axis to get to the desired
+ *   crop? By default we rotate, but this can be overridden to do prefer doing
+ *   flips (if possible).
  *
  * @typedef {{
  *  corner: glift.enums.boardRegions,
  *  side: glift.enums.boardRegions,
+ *  preferFlips: (boolean|undefined),
  * }}
  */
 glift.orientation.AutoRotateCropPrefs;
@@ -22,14 +26,38 @@ glift.orientation.AutoRotateCropPrefs;
  */
 glift.orientation.autoRotateCrop = function(movetree, opt_prefs) {
   var nmt = movetree.newTreeRef();
-  var rotation = glift.orientation.findCanonicalRotation(movetree, opt_prefs);
-  nmt.recurseFromRoot(function(mt) {
-    var props = mt.properties();
-    props.forEach(function(prop, vals) {
-      var size = movetree.getIntersections();
-      props.rotate(prop, size, rotation);
+  var region = glift.orientation.getQuadCropFromMovetree(movetree);
+  var rotation = glift.orientation.findCropRotation_(region, opt_prefs);
+  if (rotation == glift.enums.rotations.NO_ROTATION) {
+    return nmt.getTreeFromRoot();
+  }
+
+  var doFlips = !!opt_prefs.preferFlips;
+  var flip = glift.enums.Flip.NO_FLIP;
+  if (doFlips) {
+    flip = glift.orientation.flipForRotation_(region, rotation);
+  }
+  if (flip !== glift.enums.Flip.NO_FLIP) {
+    nmt.recurseFromRoot(function(mt) {
+      var props = mt.properties();
+      props.forEach(function(prop, vals) {
+        var size = movetree.getIntersections();
+        if (flip === glift.enums.Flip.VERTICAL) {
+          props.flipVert(prop, size);
+        } else {
+          props.flipHorz(prop, size);
+        }
+      });
     });
-  });
+  } else {
+    nmt.recurseFromRoot(function(mt) {
+      var props = mt.properties();
+      props.forEach(function(prop, vals) {
+        var size = movetree.getIntersections();
+        props.rotate(prop, size, rotation);
+      });
+    });
+  }
   return nmt.getTreeFromRoot();
 };
 
@@ -47,8 +75,20 @@ glift.orientation.autoRotateCrop = function(movetree, opt_prefs) {
  * @param {!glift.orientation.AutoRotateCropPrefs=} opt_prefs
  * @return {!glift.enums.rotations} The rotation that should be performed.
  */
-glift.orientation.findCanonicalRotation =
-    function(movetree, opt_prefs) {
+glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
+  var region = glift.orientation.getQuadCropFromMovetree(movetree);
+  return glift.orientation.findCropRotation_(region, opt_prefs);
+};
+
+/**
+ * Calculates what rotation is required to go from one orientation to another orientation.
+ *
+ * @param {!glift.enums.boardRegions} region
+ * @param {!glift.orientation.AutoRotateCropPrefs=} opt_prefs
+ * @return {!glift.enums.rotations} The rotation that should be performed.
+ * @private
+ */
+glift.orientation.findCropRotation_ = function(region, opt_prefs) {
   var boardRegions = glift.enums.boardRegions;
   var rotations = glift.enums.rotations;
   var cornerRegions = {
@@ -71,8 +111,6 @@ glift.orientation.findCanonicalRotation =
       side: boardRegions.TOP
     };
   }
-
-  var region = glift.orientation.getQuadCropFromMovetree(movetree);
 
   if (cornerRegions[region] !== undefined ||
       sideRegions[region] !== undefined) {
@@ -100,4 +138,36 @@ glift.orientation.findCanonicalRotation =
   // No rotations. We only rotate when the quad crop region is either a corner
   // or a side.
   return rotations.NO_ROTATION;
+};
+
+/**
+ * @param {glift.enums.boardRegions} region
+ * @param {glift.enums.rotations} rotation
+ * @return {glift.enums.Flip}
+ * @private
+ */
+glift.orientation.flipForRotation_ = function(region, rotation) {
+  var br = glift.enums.boardRegions;
+  var rots = glift.enums.rotations;
+
+  if (rotation === rots.CLOCKWISE_90 &&
+      (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)) {
+    return glift.enums.Flip.HORIZONTAL;
+
+  } else if (rotation === rots.CLOCKWISE_90 &&
+      (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)) {
+    return glift.enums.Flip.VERTICAL;
+
+  } else if (rotation === rots.CLOCKWISE_270 &&
+      (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)) {
+    return glift.enums.Flip.VERTICAL;
+
+  } else if (rotation === rots.CLOCKWISE_270 &&
+      (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)) {
+    return glift.enums.Flip.HORIZONTAL;
+  }
+
+  // TODO(kashomon): Add support for sides.
+
+  return glift.enums.Flip.NO_FLIP;
 };
