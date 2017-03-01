@@ -281,6 +281,9 @@ glift.Point.prototype = {
    * @return {!glift.Point}
    */
   normalize: function(size) {
+    if (!size) {
+      throw new Error('Size is required for normalization. Was: ' + size);
+    }
     var mid = (size - 1) / 2;
     return glift.util.point(this.x() - mid, mid - this.y());
   },
