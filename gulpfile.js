@@ -5,6 +5,7 @@ var gulp = require('gulp'),
     gutil = require('gulp-util'),
     size = require('gulp-size'),
     concat = require('gulp-concat'),
+    chmod = require('gulp-chmod'),
     closureCompiler = require('google-closure-compiler').gulp({
       // extraArguments: ['-Xms2048m']
     }),
@@ -68,7 +69,7 @@ gulp.task('compile', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
     .pipe(closureCompiler({
       // compilerPath: './tools/compiler-latest/compiler.jar',
-      js_output_file: 'gpub.js',
+      js_output_file: 'glift-core.js',
       language_in: 'ECMASCRIPT5_STRICT',
       //language_in: 'ECMASCRIPT5_STRICT',
       // TODO(kashomon): Turn on ADVANCED_OPTIMIZATIONS when all the right
@@ -117,6 +118,7 @@ gulp.task('concat', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
     .pipe(concat('glift-core-concat.js'))
     .pipe(size())
+    .pipe(chmod(0o666))
     .pipe(gulp.dest('./compiled/'))
 })
 
