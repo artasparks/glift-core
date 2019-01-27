@@ -2,7 +2,6 @@
 
 var gulp = require('gulp'),
     qunit = require('gulp-qunit'),
-    gutil = require('gulp-util'),
     size = require('gulp-size'),
     concat = require('gulp-concat'),
     chmod = require('gulp-chmod'),
@@ -33,33 +32,12 @@ var srcIgnore = ['!src/**/*_test.js']
 // The glob used for determining tests
 var testGlob = ['src/**/*_test.js']
 
-// The full build-test cycle. This:
-// - Updates all the HTML files
-// - Recreates the concat-target
-// - Runs all the tests
-// - Compiles with JSCompiler + TypeChecking
-gulp.task('build-test', ['concat', 'compile', 'test'])
-
-gulp.task('test', ['update-html-tests', 'update-html-srcs'], () => {
-  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
-});
-
-gulp.task('test-simple', () => {
-  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
-});
-
-// A watcher for the the full build-test cycle.
-gulp.task('test-watch', () => {
-  return gulp.watch([
-    'src/**/*.js',
-    'src/**/*_test.js'], ['test'] );
-});
-
-// A simpler watcher that just updates the 
-gulp.task('update-html-watch', () => {
-  return gulp.watch([
-    'src/**/*.js',
-    'src/**/*_test.js'], ['update-html-tests', 'update-html-srcs'] );
+gulp.task('concat', () => {
+  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
+    .pipe(concat('glift-core-concat.js'))
+    .pipe(size())
+    .pipe(chmod(0o666))
+    .pipe(gulp.dest('./compiled/'))
 })
 
 // Compile the sources with the JS Compiler
@@ -114,14 +92,6 @@ gulp.task('compile', () => {
     .pipe(gulp.dest('./compiled/'))
 })
 
-gulp.task('concat', () => {
-  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
-    .pipe(concat('glift-core-concat.js'))
-    .pipe(size())
-    .pipe(chmod(0o666))
-    .pipe(gulp.dest('./compiled/'))
-})
-
 // Update the HTML tests with the dev JS source files
 gulp.task('update-html-srcs', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
@@ -146,28 +116,6 @@ gulp.task('update-html-tests', () => {
     }))
 })
 
-// Update the HTML tests with the compiled glift.
-gulp.task('update-html-compiled', ['compile'], () => {
-  return gulp.src('./compiled/glift-core.js')
-    .pipe(updateHtmlFiles({
-      filesGlob: './test/htmltests/*.html',
-      outDir: './test/htmltests_gen/',
-      header: '<!-- AUTO-GEN-DEPS -->',
-      footer: '<!-- END-AUTO-GEN-DEPS -->',
-      dirHeader: '<!-- %s sources -->',
-    }))
-});
-
-gulp.task('compile-test', ['update-html-compiled'], () => {
-  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
-});
-
-gulp.task('compile-watch', () => {
-  return gulp.watch([
-    'src/**/*.js',
-    'src/**/*_test.js'], ['update-html-compiled'] );
-});
-
 gulp.task('src-gen', () => {
   gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
     .pipe(through.obj(function(file, enc, cb) {
@@ -178,6 +126,57 @@ gulp.task('src-gen', () => {
     }));
 });
 
+gulp.task('test-simple', () => {
+  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
+});
+
+gulp.task('test', gulp.series('update-html-tests', 'update-html-srcs', () => {
+  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
+}));
+
+// The full build-test cycle. This:
+// - Updates all the HTML files
+// - Recreates the concat-target
+// - Runs all the tests
+// - Compiles with JSCompiler + TypeChecking
+gulp.task('build-test', gulp.series('concat', 'compile', 'test'))
+
+// A watcher for the the full build-test cycle.
+gulp.task('test-watch', () => {
+  return gulp.watch(
+    'src/**/*.js',
+    'src/**/*_test.js', ['test'] );
+});
+
+// A simpler watcher that just updates the 
+gulp.task('update-html-watch', () => {
+  return gulp.watch([
+    'src/**/*.js',
+    'src/**/*_test.js'], ['update-html-tests', 'update-html-srcs'] );
+})
+
+// Update the HTML tests with the compiled glift.
+gulp.task('update-html-compiled', gulp.series('compile', () => {
+  return gulp.src('./compiled/glift-core.js')
+    .pipe(updateHtmlFiles({
+      filesGlob: './test/htmltests/*.html',
+      outDir: './test/htmltests_gen/',
+      header: '<!-- AUTO-GEN-DEPS -->',
+      footer: '<!-- END-AUTO-GEN-DEPS -->',
+      dirHeader: '<!-- %s sources -->',
+    }))
+}));
+
+gulp.task('compile-test', gulp.series('update-html-compiled', () => {
+  return gulp.src('./test/htmltests_gen/GCoreTest.html').pipe(qunit())
+}));
+
+gulp.task('compile-watch', () => {
+  return gulp.watch([
+    'src/**/*.js',
+    'src/**/*_test.js'], ['update-html-compiled'] );
+});
+
 /////////////////////////////////////////////////
 /////////////// Library Functions ///////////////
 /////////////////////////////////////////////////
@@ -185,7 +184,6 @@ gulp.task('src-gen', () => {
 // Beware! Below lie demons unvanquished.
 //
 // TODO(kashomon): Move these to a node library for sharing with GPub
-
 
 /**
  * Takes an ordering array and an ignore glob-array and generates a glob array
