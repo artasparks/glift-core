@@ -5,13 +5,11 @@ var gulp = require('gulp'),
     size = require('gulp-size'),
     concat = require('gulp-concat'),
     chmod = require('gulp-chmod'),
-    closureCompiler = require('google-closure-compiler').gulp({
-      // extraArguments: ['-Xms2048m']
-    }),
     through = require('through2'),
 
-    updateHtmlFiles = require('./src/dev/updatehtml.js').updateHtml,
-    jsSrcGlobGen = require('./src/dev/srcgen.js').genSrc;
+    closureCompiler = require('./src/dev/closure-compiler.js'),
+    updateHtmlFiles = require('./src/dev/updatehtml.js'),
+    jsSrcGlobGen = require('./src/dev/srcgen.js');
 
 // The source paths, used for generating the glob, for determining sources.
 var srcPaths = [
@@ -44,49 +42,7 @@ gulp.task('concat', () => {
 // for more details
 gulp.task('compile', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
-    .pipe(closureCompiler({
-      // compilerPath: './tools/compiler-latest/compiler.jar',
-      js_output_file: 'glift-core.js',
-      language_in: 'ECMASCRIPT5_STRICT',
-      //language_in: 'ECMASCRIPT5_STRICT',
-      // TODO(kashomon): Turn on ADVANCED_OPTIMIZATIONS when all the right
-      // functions have been marked @export, where appropriate
-      // compilation_level: 'ADVANCED_OPTIMIZATIONS',
-      //
-      // Note that warning_level=VERBOSE corresponds to:
-      //
-      // --jscomp_warning=checkTypes
-      // --jscomp_error=checkVars
-      // --jscomp_warning=deprecated
-      // --jscomp_error=duplicate
-      // --jscomp_warning=globalThis
-      // --jscomp_warning=missingProperties
-      // --jscomp_warning=undefinedNames
-      // --jscomp_error=undefinedVars
-      //
-      // Do some advanced Javascript checks.
-      // https://github.com/google/closure-compiler/wiki/Warnings
-      jscomp_error: [
-        'accessControls',
-        'checkRegExp',
-        'checkTypes',
-        'checkVars',
-        'const',
-        'constantProperty',
-        'deprecated',
-        'duplicate',
-        'globalThis',
-        'missingProperties',
-        'missingProvide',
-        'missingReturn',
-        'undefinedNames',
-        'undefinedVars',
-        'visibility',
-        // We don't turn requires into Errors, because the closure compiler
-        // reorders the sources based on the requires.
-        // 'missingRequire',
-      ],
-    }))
+    .pipe(closureCompiler('glift-core.js'))
     .pipe(size())
     .pipe(gulp.dest('./compiled/'))
 })

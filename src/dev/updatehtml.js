@@ -83,6 +83,4 @@ var updateHtmlFiles = function(params) {
   })
 };
 
-module.exports = {
-  updateHtml: updateHtmlFiles,
-};
+module.exports = updateHtmlFiles;

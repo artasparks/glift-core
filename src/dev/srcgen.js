@@ -102,6 +102,4 @@ var jsSrcGlobGen = function(ordering, addGlobs) {
   return out.concat(addGlobs);
 };
 
-module.exports = {
-  genSrc: jsSrcGlobGen,
-};
+module.exports = jsSrcGlobGen;
