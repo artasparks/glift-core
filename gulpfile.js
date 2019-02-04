@@ -23,7 +23,7 @@ var srcPaths = [
 
   'src'];
 
-// Ignore the test files
+// Ignore the test files, dev files
 var srcIgnore = ['!src/**/*_test.js', '!**/dev/*']
 
 // The glob used for determining tests
