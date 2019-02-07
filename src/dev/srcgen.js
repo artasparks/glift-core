@@ -75,7 +75,13 @@ var jsSrcGlobGen = function(ordering, addGlobs) {
     if (fs.existsSync(nsfile)) {
       out.push(nsfile);
     }
+    var tsfile = path.join(dirPath, last + '.ts');
+    if (fs.existsSync(tsfile)) {
+      out.push(tsfile);
+    }
+
     out.push(path.join(dirPath, '*.js'));
+    out.push(path.join(dirPath, '*.ts'));
 
     fs.readdirSync(dirPath).forEach((f) => {
       var fpath = path.join(dirPath, f)

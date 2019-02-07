@@ -6,6 +6,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     chmod = require('gulp-chmod'),
     through = require('through2'),
+    ts = require('gulp-typescript'),
 
     closureCompiler = require('./src/dev/closure-compiler.js'),
     updateHtmlFiles = require('./src/dev/updatehtml.js'),
@@ -24,10 +25,10 @@ var srcPaths = [
   'src'];
 
 // Ignore the test files, dev files
-var srcIgnore = ['!src/**/*_test.js', '!**/dev/*']
+var srcIgnore = ['!src/**/*_test.js', '!src/**/*_test.ts', '!**/dev/*']
 
 // The glob used for determining tests
-var testGlob = ['src/**/*_test.js']
+var testGlob = ['src/**/*_test.js', 'src/**/*_test.ts']
 
 gulp.task('concat', () => {
   return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
@@ -46,6 +47,28 @@ gulp.task('compile', () => {
     .pipe(size())
     .pipe(gulp.dest('./compiled/'))
 })
+
+// compile typescript + js
+gulp.task('cts', () => {
+  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
+    .pipe(ts({
+        noImplicitAny: true,
+        allowJs: true,
+        outFile: 'glift-core.ts.js'
+    }))
+    .pipe(gulp.dest('./compiled/'));
+});
+
+// compile just typescript
+gulp.task('cts-o', () => {
+  return gulp.src('src/**/*.ts')
+    .pipe(ts({
+        noImplicitAny: true,
+        outFile: 'glift-core.only.js'
+    }))
+    .pipe(gulp.dest('./compiled/'));
+});
+
 
 // Update the HTML tests with the dev JS source files
 gulp.task('update-html-srcs', () => {
