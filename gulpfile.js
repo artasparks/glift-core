@@ -50,7 +50,7 @@ gulp.task('compile', () => {
 
 // compile typescript + js
 gulp.task('cts', () => {
-  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
+  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore, true /* ts */), {base: '.'})
     .pipe(ts({
         noImplicitAny: true,
         allowJs: true,
