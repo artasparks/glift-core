@@ -31,7 +31,7 @@ var srcIgnore = ['!src/**/*_test.js', '!src/**/*_test.ts', '!**/dev/*']
 var testGlob = ['src/**/*_test.js', 'src/**/*_test.ts']
 
 gulp.task('concat', () => {
-  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
+  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
     .pipe(concat('glift-core-concat.js'))
     .pipe(size())
     .pipe(chmod(0o666))
@@ -72,7 +72,7 @@ gulp.task('cts-o', () => {
 
 // Update the HTML tests with the dev JS source files
 gulp.task('update-html-srcs', () => {
-  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore))
+  return gulp.src(jsSrcGlobGen(srcPaths, srcIgnore), {base: '.'})
     .pipe(updateHtmlFiles({
       filesGlob: './test/htmltests/*.html',
       outDir: './test/htmltests_gen/',
@@ -121,16 +121,16 @@ gulp.task('build-test', gulp.series('concat', 'compile', 'test'))
 
 // A watcher for the the full build-test cycle.
 gulp.task('test-watch', () => {
-  return gulp.watch(
+  return gulp.watch([
     'src/**/*.js',
-    'src/**/*_test.js', ['test'] );
+    'src/**/*_test.js'], gulp.series('test'))
 });
 
 // A simpler watcher that just updates the 
 gulp.task('update-html-watch', () => {
   return gulp.watch([
     'src/**/*.js',
-    'src/**/*_test.js'], ['update-html-tests', 'update-html-srcs'] );
+    'src/**/*_test.js'], gulp.series('update-html-tests', 'update-html-srcs'))
 })
 
 // Update the HTML tests with the compiled glift.
@@ -152,5 +152,5 @@ gulp.task('compile-test', gulp.series('update-html-compiled', () => {
 gulp.task('compile-watch', () => {
   return gulp.watch([
     'src/**/*.js',
-    'src/**/*_test.js'], ['update-html-compiled'] );
+    'src/**/*_test.js'], gulp.series('update-html-compiled'))
 });
