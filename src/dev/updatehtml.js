@@ -35,7 +35,7 @@ var updateHtmlFiles = function(params) {
 
   var dirHeader = params.dirHeader;
   var all = [];
-  var template = params.template || '<script type="text/javascript" src="%s"></script>';
+  var template = params.template || '<script type="module" src="%s"></script>';
 
   return through.obj(function(file, enc, cb) {
     all.push(file);

@@ -1,5 +1,6 @@
-goog.provide('glift.svg.SvgObj');
-goog.provide('glift.svg.ViewBox');
+/**
+ * svgobj.js provides methods a class wrapper for SVG objects.
+ */
 
 /**
  * @typedef {{
@@ -9,8 +10,7 @@ goog.provide('glift.svg.ViewBox');
  *  brY: number
  * }}
  */
-glift.svg.ViewBox;
-
+export var ViewBox;
 
 /**
  * Creats a SVG Wrapper object.
@@ -18,17 +18,17 @@ glift.svg.ViewBox;
  * @param {string} type Svg element type.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
  */
-glift.svg.createObj = function(type, opt_attrObj) {
-   return new glift.svg.SvgObj(type, opt_attrObj);
+export function createObj(type, opt_attrObj) {
+   return new SvgObj(type, opt_attrObj);
 };
 
 /**
  * Creates a root SVG object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.svg = function(opt_attrObj) {
-  return new glift.svg.SvgObj('svg', opt_attrObj)
+export function svg(opt_attrObj) {
+  return new SvgObj('svg', opt_attrObj)
       .setAttr('version', '1.1')
       .setAttr('xmlns', 'http://www.w3.org/2000/svg');
 };
@@ -36,54 +36,54 @@ glift.svg.svg = function(opt_attrObj) {
 /**
  * Creates a circle svg object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.circle = function(opt_attrObj) {
-  return new glift.svg.SvgObj('circle', opt_attrObj);
+export function circle(opt_attrObj) {
+  return new SvgObj('circle', opt_attrObj);
 };
 
 /**
  * Creates a path svg object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.path = function(opt_attrObj) {
-  return new glift.svg.SvgObj('path', opt_attrObj);
+export function path(opt_attrObj) {
+  return new SvgObj('path', opt_attrObj);
 };
 
 /**
  * Creates an rectangle svg object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.rect = function(opt_attrObj) {
-  return new glift.svg.SvgObj('rect', opt_attrObj);
+export function rect(opt_attrObj) {
+  return new SvgObj('rect', opt_attrObj);
 };
 
 /**
  * Creates an image svg object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.image = function(opt_attrObj) {
-  return new glift.svg.SvgObj('image', opt_attrObj);
+export function image(opt_attrObj) {
+  return new SvgObj('image', opt_attrObj);
 };
 
 /**
  * Creates a text svg object.
  * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.text = function(opt_attrObj) {
-  return new glift.svg.SvgObj('text', opt_attrObj);
+export function text(opt_attrObj) {
+  return new SvgObj('text', opt_attrObj);
 };
 
 /**
  * Create a group object (without any attributes)
- * @return {!glift.svg.SvgObj}
+ * @return {!SvgObj}
  */
-glift.svg.group = function() {
-  return new glift.svg.SvgObj('g');
+export function group() {
+  return new SvgObj('g');
 };
 
 /**
@@ -93,7 +93,7 @@ glift.svg.group = function() {
  * @param {string} type Svg element type.
  * @param {Object<string>=} opt_attrObj optional attribute object.
  */
-glift.svg.SvgObj = function(type, opt_attrObj) {
+export var SvgObj = function(type, opt_attrObj) {
   /** @private {string} */
   this.type_ = type;
 
@@ -107,19 +107,19 @@ glift.svg.SvgObj = function(type, opt_attrObj) {
 
   /** @private {!Object<string>} */
   this.attrMap_ = opt_attrObj || {};
-  /** @private {!Array<!glift.svg.SvgObj>} */
+  /** @private {!Array<!SvgObj>} */
   this.children_ = [];
-  /** @private {!Object<!glift.svg.SvgObj>} */
+  /** @private {!Object<!SvgObj>} */
   this.idMap_ = {};
   /** @private {string} */
   this.text_ = '';
-  /** @private {!glift.svg.ViewBox|undefined} */
+  /** @private {!ViewBox|undefined} */
   this.viewBox_ = undefined;
   /** @private {?Object} */
   this.data_ = null;
 };
 
-glift.svg.SvgObj.prototype = {
+SvgObj.prototype = {
   /**
    * Return the string form of the svg object.
    * @return {string}
@@ -170,7 +170,7 @@ glift.svg.SvgObj.prototype = {
    * Sets an SVG attribute.
    * @param {string} key The key of an object in the map.
    * @param {string|number} value The value to set in the map.
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setAttr: function(key, value) {
     this.attrMap_[key] = value + '';
@@ -180,7 +180,7 @@ glift.svg.SvgObj.prototype = {
   /**
    * Sets the top-level CSS-styling.
    * @param {string} s
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setStyle: function(s) {
     this.style_ = s;
@@ -195,7 +195,7 @@ glift.svg.SvgObj.prototype = {
    * @param {number} tlY tl.x
    * @param {number} brX br.y
    * @param {number} brY br.x
-   * @return {!glift.svg.SvgObj} this
+   * @return {!SvgObj} this
    */
   setViewBox: function(tlX, tlY, brX, brY) {
     this.viewBox_ = {
@@ -226,7 +226,7 @@ glift.svg.SvgObj.prototype = {
   /**
    * Sets the ID (using the Attribute object as a store).
    * @param {string} id
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setId: function(id) {
     if (id) {
@@ -243,7 +243,7 @@ glift.svg.SvgObj.prototype = {
   /**
    * Sets the entire attribute object.
    * @param {!Object<string>} attrObj
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setAttrObj: function(attrObj) {
     if (glift.util.typeOf(attrObj) !== 'object') {
@@ -262,7 +262,7 @@ glift.svg.SvgObj.prototype = {
    * Set some internal data. Note: this data is not attached when the element is
    * generated.
    * @param {!Object} data
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setData: function(data) {
     this.data_ = data;
@@ -277,7 +277,7 @@ glift.svg.SvgObj.prototype = {
   /**
    * Append some text. Usually only for text elements.
    * @param {string} text
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   setText: function(text) {
     this.text_ = text;
@@ -291,7 +291,7 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Get child from an Id.
-   * @return {!glift.svg.SvgObj} The child obj.
+   * @return {!SvgObj} The child obj.
    */
   child: function(id) {
     return this.idMap_[id];
@@ -299,7 +299,7 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Remove child, based on id.
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   rmChild: function(id) {
     delete this.idMap_[id];
@@ -308,7 +308,7 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Get all the Children.
-   * @return {!Array<!glift.svg.SvgObj>}
+   * @return {!Array<!SvgObj>}
    */
   children: function() {
     return this.children_;
@@ -316,7 +316,7 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Empty out all the children.
-   * @return {!glift.svg.SvgObj} this object.
+   * @return {!SvgObj} this object.
    */
   emptyChildren: function() {
     this.children_ = [];
@@ -325,8 +325,8 @@ glift.svg.SvgObj.prototype = {
 
   /**
    * Add an already existing child.
-   * @param {!glift.svg.SvgObj} obj Object to add.
-   * @return {!glift.svg.SvgObj} This object.
+   * @param {!SvgObj} obj Object to add.
+   * @return {!SvgObj} This object.
    */
   append: function(obj) {
     if (obj.id() !== undefined) {
@@ -340,22 +340,22 @@ glift.svg.SvgObj.prototype = {
    * Add a new svg object child.
    * @param {string} type
    * @param {!Object<string>} attrObj
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} This object.
    */
   appendNew: function(type, attrObj) {
-    var obj = glift.svg.createObj(type, attrObj);
+    var obj = createObj(type, attrObj);
     return this.append(obj);
   },
 
   /**
    * Create a copy of the object without any children
-   * @return {!glift.svg.SvgObj} The new object.
+   * @return {!SvgObj} The new object.
    */
   copyNoChildren: function() {
     var newAttr = {};
     for (var key in this.attrMap_) {
       newAttr[key] = this.attrMap_[key];
     }
-    return glift.svg.createObj(this.type_, newAttr);
+    return createObj(this.type_, newAttr);
   }
 };

@@ -1,8 +1,5 @@
 goog.provide('glift.util');
 
-goog.require('glift');
-
-
 glift.util = {
   /**
    * Log a message. Allows the for the possibility of overwriting for tests.

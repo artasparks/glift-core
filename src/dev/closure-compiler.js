@@ -2,7 +2,7 @@
 
 
 /**
- *
+ * Shared closure-compiler definition
  */
 
 const closureCompiler = require('google-closure-compiler').gulp({
@@ -23,7 +23,9 @@ var defaultCompile = function(outName) {
 
   return closureCompiler({
     js_output_file: outName,
-    language_in: 'ECMASCRIPT5_STRICT',
+    language_in: 'ECMASCRIPT6_STRICT',
+    language_out: 'ECMASCRIPT5_STRICT',
+    module_resolution: 'NODE',
     // TODO(kashomon): Turn on ADVANCED_OPTIMIZATIONS when all the right
     // functions have been marked @export, where appropriate
     // compilation_level: 'ADVANCED_OPTIMIZATIONS',
@@ -50,6 +52,7 @@ var defaultCompile = function(outName) {
       'constantProperty',
       'deprecated',
       'duplicate',
+      'functionParams',
       'globalThis',
       'missingProperties',
       'missingProvide',
@@ -61,6 +64,10 @@ var defaultCompile = function(outName) {
       // reorders the sources based on the requires.
       // 'missingRequire',
     ],
+    jscomp_off: [
+      // Needs to be suppressed for requireJS.
+      'functionParams',
+    ]
   });
 };
 

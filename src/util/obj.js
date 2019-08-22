@@ -1,7 +1,5 @@
 goog.provide('glift.util.obj');
 
-goog.require('glift.util');
-
 goog.scope(function() {
 
 var supportsArgumentsClass = (function(){

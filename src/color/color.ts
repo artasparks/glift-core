@@ -1,3 +1,5 @@
+// import "../glift";
+
 namespace glift.color {
   export enum Color {
     BLACK = 'BLACK',

@@ -1,5 +1,8 @@
-(function() {
-  module("glift.svg.pathUtilsTest");
+import('./pathutils.js').then((path) => {
+  console.log('Log mah thing');
+
+  QUnit.module("glift.svg.pathUtilsTest");
+
   var path = glift.svg.pathutils;
   var pt = glift.util.point(3, 5);
 
@@ -26,4 +29,4 @@
   test("Test path lineAbsPt", function() {
     deepEqual(path.lineAbsPt(pt), "L3 5");
   });
-})();
+})

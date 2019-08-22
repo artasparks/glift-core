@@ -1,6 +1,7 @@
+import * as path from './pathutils.js';
+
 (function() {
   module('glift.svg.svgObjTest');
-  var svg = glift.svg;
 
   test('Test svg creation', function() {
     deepEqual(svg.svg().render(),
