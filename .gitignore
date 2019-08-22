@@ -17,6 +17,7 @@ node_modules
 
 # Generated files
 /compiled/*
+/dist/*
 test/htmltests_gen/*
 
 # Misc settings

@@ -28,28 +28,6 @@ glift.util = {
     return s;
   },
 
-  /**
-   * Checks to make sure a number is inbounds.  In other words, whether a number
-   * is between 0 (inclusive) and bounds (exclusive).
-   * @param {number} num
-   * @param {number} bounds
-   * @return {boolean}
-   */
-  inBounds: function(num, bounds) {
-    return ((num < bounds) && (num >= 0));
-  },
-
-  /**
-   * Checks to make sure a number is out-of-bounds
-   * returns true if a number is outside a bounds (inclusive) or negative
-   * @param {number} num
-   * @param {number} bounds
-   * @return {boolean}
-   */
-  outBounds: function(num, bounds) {
-    return ((num >= bounds) || (num < 0));
-  },
-
   // Init a key if the obj is undefined at the key with the given value.
   // Return the value
   getKeyWithDefault: function(obj, key, value) {

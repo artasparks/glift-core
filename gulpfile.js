@@ -1,15 +1,16 @@
 'use strict';
 
 const gulp = require('gulp'),
-    closureCompiler = require('google-closure-compiler').gulp();
+    ts = require('gulp-typescript');
 
-
- 
 gulp.task('default', function() {
-  return gulp.src('src/**/*.js')
-    .pipe(closureCompiler({
-      language_in: 'ECMASCRIPT6_STRICT',
-      language_out: 'ECMASCRIPT5_STRICT',
+  // TODO(kashomon): replace with a glob
+  return gulp.src([
+      'src/**/*.ts',
+    ])
+    .pipe(ts({
+        noImplicitAny: true,
+        strictNullChecks: true
     }))
     .pipe(gulp.dest('dist'));
 });
