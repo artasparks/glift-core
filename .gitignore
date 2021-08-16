@@ -32,3 +32,6 @@ bazel-genfiles
 bazel-glift-core
 bazel-out
 bazel-testlogs
+
+# typescript generated code
+dist
